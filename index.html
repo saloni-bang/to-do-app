@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<style>
+    .entry-field {
+        margin-bottom: 20px;
+        margin-right: 20px;
+    }
+
+    .check-box {
+        height: 15px;
+        width: 15px;
+    }
+</style>
+<script>
+    var completed;
+    function addTaskClicked() {
+        createRow();
+    }
+    function createRow(task, completed) {
+        var tasklist = document.getElementById("tasklist");
+        var newdiv = document.createElement("div");
+        var input = document.createElement("input");
+        var deleteButton = document.createElement("button");
+
+        deleteButton.innerHTML = "delete";
+        deleteButton.setAttribute("onclick", "taskDeleted(event)");
+        var input2 = document.createElement("input");
+        input2.type = "checkbox";
+        input2.id = "new-task-completed";
+        input.id = "new-task";
+        input.classList = "entry-field";
+        input2.classList = "check-box";
+        if (task) {
+            input.value = task;
+
+        }
+        if (completed) {
+            input2.checked = completed;
+        }
+        newdiv.appendChild(input);
+        let br = document.createElement("br");
+        newdiv.appendChild(input2);
+        newdiv.appendChild(deleteButton);
+        newdiv.appendChild(br);
+        tasklist.appendChild(newdiv);
+    }
+    function taskDeleted(event) {
+        event.currentTarget.parentElement.innerHTML = "";
+
+
+    }
+    function taskSearched() {
+
+        var searchBox = document.getElementById("search-box");
+        let task = searchBox.value;
+        var tasklist = document.getElementById("tasklist");
+        var rows = tasklist.children;
+        for (let i = 0; i < rows.length; i++) {
+            let element = rows[i];
+            let currentTask = element.children[0].value;
+
+            if (currentTask != task) {
+                element.innerHTML = "";
+
+            }
+        }
+
+    }
+
+    function taskReset() {
+        var tasklist = document.getElementById("tasklist");
+        tasklist.innerHTML = "";
+        readTask();
+    }
+
+    function sendTask() {
+        let newTasks = document.getElementsByClassName("entry-field");
+        let newTasksCompleted = document.getElementsByClassName("check-box");
+        let bodyarray = []
+        for (let i = 0; i < newTasks.length; i++) {
+            let body = {
+                task: newTasks[i].value,
+                completed: newTasksCompleted[i].checked
+            };
+            bodyarray.push(body);
+
+        }
+
+
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log('success');
+            }
+        }
+        xhttp.open("POST", `/update-task`, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify(bodyarray));
+    }
+
+    function readTask() {
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let response = JSON.parse(this.response);
+                for (let i = 0; i < response.length; i++) {
+                    let element = response[i];
+                    createRow(element.task, element.completed);
+
+
+                }
+            }
+        }
+
+        xhttp.open("POST", `/read-task`, true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send();
+
+
+    }
+
+</script>
+<header style= "color: white;text-align: center;font-size: 50px;font-weight: bold;">
+    To Do APP
+</header>
+
+<body style="text-align: center; " onload="readTask();" background="abc.jpg">
+    <input id="search-box"> </input>
+    <button style="margin-top:20px;" id="add-button" onclick="taskSearched()">
+        Search
+    </button>
+
+    <button style="margin-top:20px;" id="add-button" onclick="taskReset()">
+        Reset
+    </button>
+    <br></br>
+    <button style="margin-bottom:20px;margin-top:20px;" id="add-button" onclick="addTaskClicked()">
+        Add-task
+    </button>
+    <div id="tasklist"></div>
+    <button id="submit" type="submit" onclick="sendTask()">
+        Submit
+    </button>
+</body>
+
+</html>

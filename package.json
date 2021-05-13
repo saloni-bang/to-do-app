@@ -1,0 +1,18 @@
+{
+  "name": "to-do-app",
+  "version": "1.0.0",
+  "description": "to add complete task",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "to",
+    "do"
+  ],
+  "author": "saloni gupta",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
